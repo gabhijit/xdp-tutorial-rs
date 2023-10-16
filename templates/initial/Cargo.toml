@@ -1,0 +1,7 @@
+# Initial Cargo.toml
+
+edition = "2021"
+
+[workspace]
+members =  [ "xtask", "common"]
+resolver = "2"

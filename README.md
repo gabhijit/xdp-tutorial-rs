@@ -1,3 +1,5 @@
+**(Note: Not Ready Yet! Do not use!)**
+
 # Overview
 
 Code for [xdp-project's xdp-tutorial](https://github.com/xdp-project/xdp-tutorial/) in Rust.
@@ -42,6 +44,4 @@ cargo install llvm
 
 Just to make sure that we have everything set up properly, we will start with a basic 'hello-xdp' program and then actually start with the parts of the tutorial.
 
-## `xdp-tut` helper
-
-Current repository provides a helper utility called `xdp-tut`. This utility can be used to generate scaffolding for different tutorial chapters. This is very similar to `cargo generate`, just tailored for the specific needs of XDP tutorial.
+We are making use of a utility called as `cargo-scaffold` to generate basic scaffolding code for different parts of the tutorial.

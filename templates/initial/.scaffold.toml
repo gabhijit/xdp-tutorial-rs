@@ -1,0 +1,14 @@
+[template]
+name = "initial"
+
+
+notes = """
+	XDP Setup crates!
+"""
+
+[parameters]
+	[parameters.program_type]
+	type = "select"
+	message = "Type of eBPF Program?"
+	values = ["xdp", "sk_msg"]
+	default = "xdp"
