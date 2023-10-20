@@ -31,6 +31,10 @@ impl std::fmt::Display for Architecture {
 
 #[derive(Debug, Parser)]
 pub struct Options {
+    /// Name of the eBPF target to build
+    #[clap(short, long)]
+    pub name: String,
+
     /// Set the endianness of the BPF target
     #[clap(default_value = "bpfel-unknown-none", long)]
     pub target: Architecture,
@@ -40,7 +44,8 @@ pub struct Options {
 }
 
 pub fn build_ebpf(opts: Options) -> Result<(), anyhow::Error> {
-    let dir = PathBuf::from("{{name}}-ebpf");
+    let binary = format!("{}-ebpf", opts.name);
+    let dir = PathBuf::from(&binary);
     let target = format!("--target={}", opts.target);
     let mut args = vec!["build", target.as_str(), "-Z", "build-std=core"];
     if opts.release {

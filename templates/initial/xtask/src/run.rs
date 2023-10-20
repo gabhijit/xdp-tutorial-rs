@@ -7,6 +7,10 @@ use crate::build_ebpf::{build_ebpf, Architecture, Options as BuildOptions};
 
 #[derive(Debug, Parser)]
 pub struct Options {
+    /// Set the name of the program to run.
+    #[clap(short, long)]
+    program: String,
+
     /// Set the endianness of the BPF target
     #[clap(default_value = "bpfel-unknown-none", long)]
     pub bpf_target: Architecture,
@@ -39,6 +43,7 @@ fn build(opts: &Options) -> Result<(), anyhow::Error> {
 pub fn run(opts: Options) -> Result<(), anyhow::Error> {
     // build our ebpf program followed by our application
     build_ebpf(BuildOptions {
+        name: opts.program.clone(),
         target: opts.bpf_target,
         release: opts.release,
     })
@@ -47,10 +52,12 @@ pub fn run(opts: Options) -> Result<(), anyhow::Error> {
 
     // profile we are building (release or debug)
     let profile = if opts.release { "release" } else { "debug" };
-    let bin_path = format!("target/{profile}/{{name}}");
+    let bin_path = format!("target/{profile}/xdp-runner");
 
     // arguments to pass to the application
     let mut run_args: Vec<_> = opts.run_args.iter().map(String::as_str).collect();
+    let mut bpf_program = ["--program", &opts.program].to_vec();
+    run_args.append(&mut bpf_program);
 
     // configure args
     let mut args: Vec<_> = opts.runner.trim().split_terminator(' ').collect();

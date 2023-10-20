@@ -1,0 +1,13 @@
+[template]
+name = "basic"
+
+
+notes = """
+	Added the {{tutorial_name}} to your XDP Project {{name}}
+"""
+
+[parameters]
+	[parameters.tutorial_name]
+	type = "string"
+	message = "Name of the tutorial to compile?"
+	required = true

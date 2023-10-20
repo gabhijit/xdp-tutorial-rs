@@ -3,12 +3,23 @@ name = "initial"
 
 
 notes = """
-	XDP Setup crates!
+Project '{{name}}' setup with default workspace. Next step is to add one
+or more tutorials to the project. To do this run following commands -
+
+```
+cargo scaffold templates/basic --append
+```
+
+When prompted for tutorial name - you can use name like `basic-01`.
+When prompted for project name - use '{{name}}' (Same as above).
+
+This will setup basic code for tutorial. You can then edit the code to
+complete the tutorial.
 """
 
 [parameters]
 	[parameters.program_type]
 	type = "select"
-	message = "Type of eBPF Program?"
-	values = ["xdp", "sk_msg"]
+	message = "Type of the eBPF Program (only `xdp` supported)"
+	values = ["xdp"]
 	default = "xdp"

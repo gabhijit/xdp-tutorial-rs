@@ -1,7 +1,7 @@
 # Initial Cargo.toml
 
-edition = "2021"
-
 [workspace]
-members =  [ "xtask", "common"]
+members =  [ "xtask", "runner"]
+exclude = ["*-ebpf"]
+
 resolver = "2"

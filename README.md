@@ -45,3 +45,14 @@ cargo install llvm
 Just to make sure that we have everything set up properly, we will start with a basic 'hello-xdp' program and then actually start with the parts of the tutorial.
 
 We are making use of a utility called as `cargo-scaffold` to generate basic scaffolding code for different parts of the tutorial.
+
+Run the following commands to get started.
+
+```bash
+# Use the Project Name as `tutorial` when prompted.
+
+$ cargo scaffold templates/initial
+```
+
+Follow the instructions displayed after that.
+
