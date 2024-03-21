@@ -3,10 +3,15 @@ use std::process::Command;
 use anyhow::Context as _;
 use clap::Parser;
 
-use crate::build_ebpf::{build_ebpf, Architecture, Options as BuildOptions};
+use crate::build_ebpf::{build_ebpf, Options as BuildOptions};
+use crate::common::Architecture;
 
 #[derive(Debug, Parser)]
 pub struct Options {
+    /// Set the name of the file to load.
+    #[clap(short, long)]
+    file: String,
+
     /// Set the name of the program to run.
     #[clap(short, long)]
     program: String,
@@ -14,12 +19,15 @@ pub struct Options {
     /// Set the endianness of the BPF target
     #[clap(default_value = "bpfel-unknown-none", long)]
     pub bpf_target: Architecture,
+
     /// Build and run the release target
     #[clap(long)]
     pub release: bool,
+
     /// The command used to wrap your application
     #[clap(short, long, default_value = "sudo -E")]
     pub runner: String,
+
     /// Arguments to pass to your application
     #[clap(name = "args", last = true)]
     pub run_args: Vec<String>,
@@ -43,7 +51,7 @@ fn build(opts: &Options) -> Result<(), anyhow::Error> {
 pub fn run(opts: Options) -> Result<(), anyhow::Error> {
     // build our ebpf program followed by our application
     build_ebpf(BuildOptions {
-        name: opts.program.clone(),
+        name: opts.file.clone(),
         target: opts.bpf_target,
         release: opts.release,
     })
@@ -56,7 +64,7 @@ pub fn run(opts: Options) -> Result<(), anyhow::Error> {
 
     // arguments to pass to the application
     let mut run_args: Vec<_> = opts.run_args.iter().map(String::as_str).collect();
-    let mut bpf_program = ["--program", &opts.program].to_vec();
+    let mut bpf_program = ["--program", &opts.program, "--file", &opts.file].to_vec();
     run_args.append(&mut bpf_program);
 
     // configure args

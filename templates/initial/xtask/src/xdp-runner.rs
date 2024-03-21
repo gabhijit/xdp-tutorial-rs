@@ -1,16 +1,16 @@
-use anyhow::Context;
-use aya::programs::{Xdp, XdpFlags};
-
-use aya::{include_bytes_aligned, Bpf};
-use aya_log::BpfLogger;
+use aya::Ebpf;
+use aya_log::EbpfLogger;
 
 use clap::Parser;
-use log::{debug, info, warn};
+use log::warn;
 
 #[derive(Debug, Parser)]
 struct Opt {
     #[clap(short, long)]
     program: String,
+
+    #[clap(short, long)]
+    file: String,
 }
 
 #[tokio::main]
@@ -18,11 +18,12 @@ async fn main() -> Result<(), anyhow::Error> {
     let opts = Opt::parse();
     env_logger::init();
 
-    let bpf_program = format!("target/bpfel-unknown-none/debug/{}", opts.program);
-    let bpf_program = std::fs::read(&bpf_program)?;
-    let mut bpf = Bpf::load(&bpf_program)?;
+    let bpf_bin = format!("target/bpfel-unknown-none/debug/{}", opts.file);
+    let bpf_bin = std::fs::read(&bpf_bin)?;
+    let mut bpf = Ebpf::load(&bpf_bin)?;
+    let mut _bpf_prorgam = bpf.program_mut(&opts.program);
 
-    if let Err(e) = BpfLogger::init(&mut bpf) {
+    if let Err(e) = EbpfLogger::init(&mut bpf) {
         // This can happen if you remove all log statements from your eBPF program.
         warn!("failed to initialize eBPF logger: {}", e);
     }

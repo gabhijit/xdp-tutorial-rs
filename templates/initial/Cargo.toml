@@ -1,7 +1,7 @@
 # Initial Cargo.toml
 
 [workspace]
-members =  [ "xtask", "runner"]
+members =  [ "xtask"]
 exclude = ["*-ebpf"]
 
 resolver = "2"
