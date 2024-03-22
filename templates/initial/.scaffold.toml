@@ -3,8 +3,11 @@ name = "initial"
 
 
 notes = """
+Welcome to XDP Tutorial in Rust.
+
 Project '{{name}}' setup with default workspace. Next step is to add one
-or more tutorials to the project. To do this run following commands -
+or more tutorials to the project. You can start with some basic tutorials
+using templates from the `templates/basic/` directory.
 
 ```
 cargo scaffold templates/basic --append
@@ -16,10 +19,3 @@ When prompted for project name - use '{{name}}' (Same as above).
 This will setup basic code for tutorial. You can then edit the code to
 complete the tutorial.
 """
-
-[parameters]
-	[parameters.program_type]
-	type = "select"
-	message = "Type of the eBPF Program (only `xdp` supported)"
-	values = ["xdp"]
-	default = "xdp"

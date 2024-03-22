@@ -1,3 +1,6 @@
+// The 'binary' that runs when `cargo xtask` is called.
+// Taken from `aya-template` and modified for our needs.
+//
 use std::process::exit;
 
 use clap::Parser;

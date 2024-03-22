@@ -1,3 +1,6 @@
+// For running the eBPF program
+// Taken from `aya-template` and modified for our needs.
+//
 use std::process::Command;
 
 use anyhow::Context as _;

@@ -1,3 +1,6 @@
+// For building the eBPF (XDP) program.
+// Taken from `aya-template` and modified for our needs.
+//
 use std::{path::PathBuf, process::Command};
 
 use clap::Parser;
