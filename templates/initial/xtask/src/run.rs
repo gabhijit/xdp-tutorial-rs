@@ -31,6 +31,10 @@ pub struct Options {
     #[clap(short, long, default_value = "sudo -E")]
     pub runner: String,
 
+    /// Interface to attach the program to
+    #[clap(short, name = "iface", default_value = "lo")]
+    pub iface: String,
+
     /// Arguments to pass to your application
     #[clap(name = "args", last = true)]
     pub run_args: Vec<String>,
@@ -67,7 +71,15 @@ pub fn run(opts: Options) -> Result<(), anyhow::Error> {
 
     // arguments to pass to the application
     let mut run_args: Vec<_> = opts.run_args.iter().map(String::as_str).collect();
-    let mut bpf_program = ["--program", &opts.program, "--file", &opts.file].to_vec();
+    let mut bpf_program = [
+        "--program",
+        &opts.program,
+        "--file",
+        &opts.file,
+        "--iface",
+        &opts.iface,
+    ]
+    .to_vec();
     run_args.append(&mut bpf_program);
 
     // configure args

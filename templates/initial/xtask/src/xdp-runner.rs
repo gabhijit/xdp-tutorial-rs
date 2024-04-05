@@ -51,7 +51,10 @@ async fn main() -> Result<(), anyhow::Error> {
         warn!("failed to initialize eBPF logger: {}", e);
     }
 
-    info!("XDP Program attached! Now waiting for Ctrl-C");
+    info!(
+        "XDP Program attached to '{}'! Now waiting for Ctrl-C",
+        &opts.iface
+    );
     signal::ctrl_c().await?;
     info!("Exiting...");
 

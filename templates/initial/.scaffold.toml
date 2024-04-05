@@ -10,7 +10,8 @@ or more tutorials to the project. You can start with some basic tutorials
 using templates from the `templates/basic/` directory.
 
 ```
-cargo scaffold templates/basic --append
+# For example to run 'basic-01' tutorial, run the following command
+cargo scaffold templates/basic/basic-01 --append
 ```
 
 When prompted for tutorial name - you can use name like `basic-01`.

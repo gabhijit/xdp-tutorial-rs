@@ -1,0 +1,29 @@
+[template]
+name = "basic"
+
+
+notes = """
+	Added the {{tutorial_name}} to your XDP Project {{name}}.
+
+	This tutorial just makes sure you have everything set up for running other XDP tutorials.
+
+	In this basic tutorial, we are building a simple eBPF binary called '{{tutorial_name}}'.
+	The binary is then attached to a user specified interface (or default 'lo') and for every
+	received packet, `XDP_PASS` is returned (essentially a no-op).
+
+	To run the generated binary go to the project directory and run the following command -
+	$ RUST_LOG=info cargo xtask run --file {{tutorial_name}} --program {{to_snake_case tutorial_name}}
+
+	This will build the eBPF Kernel program, the User space utility 'xdp-runner' and then call the
+	utility to be run.
+
+	In the generated eBPF binaries, there is a section called `xdp` and inside the `xdp` section,
+        there are individual XDP programs. The `{{to_snake_case tutorial_name}}` program is attached
+	to the interface (default 'lo' or can be specified by `-i <iface>` additional option).
+"""
+
+[parameters]
+	[parameters.tutorial_name]
+	type = "string"
+	message = "Name of the tutorial to use in XDP Project (default: 'basic-01')"
+	default = "basic-01"
