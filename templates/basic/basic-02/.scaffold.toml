@@ -1,0 +1,40 @@
+[template]
+name = "basic"
+
+
+notes = """
+	Added the {{tutorial_name}} to your XDP Project {{name}}.
+
+	The goal of this tutorial is to introduce various XDP Actions that can be performed
+	when a new packet is received.
+
+	Also, this tutorial introduces the concept of multiple XDP programs in the same binary and
+	how these programs can be loaded.
+
+	In this basic tutorial, we are building a eBPF binary called '{{tutorial_name}}'. Then
+	we will observe that based on different user specified 'programs', different actions can be
+	taken for the received packet.
+
+	Also, we as an assignment, user's are asked to return the `Err` variant of the `Result`
+	return type.
+
+
+	To run the generated binary go to the project directory and run the following command -
+	```
+	# This should print the log "Received one packet."
+	$ RUST_LOG=info cargo xtask run --file {{tutorial_name}} --program {{to_snake_case tutorial_name}}_pass
+
+	# This should print the warning log "Received one packet. Dropping"
+	$ RUST_LOG=info cargo xtask run --file {{tutorial_name}} --program {{to_snake_case tutorial_name}}_drop
+
+	```
+
+	Next, as an assignment write a simple program that returns an error with `XDP_ABORTED`
+	error and an error is logged on the console.
+"""
+
+[parameters]
+	[parameters.tutorial_name]
+	type = "string"
+	message = "Name of the tutorial to use in XDP Project (default: 'basic-02')"
+	default = "basic-02"

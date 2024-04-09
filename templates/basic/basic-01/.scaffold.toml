@@ -12,7 +12,9 @@ notes = """
 	received packet, `XDP_PASS` is returned (essentially a no-op).
 
 	To run the generated binary go to the project directory and run the following command -
+	```
 	$ RUST_LOG=info cargo xtask run --file {{tutorial_name}} --program {{to_snake_case tutorial_name}}
+	```
 
 	This will build the eBPF Kernel program, the User space utility 'xdp-runner' and then call the
 	utility to be run.
