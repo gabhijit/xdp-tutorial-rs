@@ -37,26 +37,38 @@ async fn main() -> Result<(), anyhow::Error> {
     let bpf_bin = format!("target/bpfel-unknown-none/debug/{}", opts.file);
     let bpf_bin = std::fs::read(&bpf_bin)?;
     let mut bpf = Ebpf::load(&bpf_bin)?;
-    let mut xdp_program: &mut Xdp = bpf
-        .program_mut(&opts.program)
-        .expect("Unable to find the attached program in the file!")
-        .try_into()?;
-    xdp_program.load()?;
-    let _linkid = xdp_program
+    let xdp_program = bpf.program_mut(&opts.program);
+
+    if let Some(xdp_program) = xdp_program {
+        let xdp: &mut Xdp = xdp_program.try_into()?;
+        xdp.load()?;
+        let _linkid = xdp
         .attach(&opts.iface, XdpFlags::default())
         .context("Failed to attach the program to the interface using the `XdpFlags::default()`, try using `XdpFlags::SKB_MODE`")?;
 
-    if let Err(e) = EbpfLogger::init(&mut bpf) {
-        // This can happen if you remove all log statements from your eBPF program.
-        warn!("failed to initialize eBPF logger: {}", e);
+        if let Err(e) = EbpfLogger::init(&mut bpf) {
+            // This can happen if you remove all log statements from your eBPF program.
+            warn!("failed to initialize eBPF logger: {}", e);
+        }
+
+        info!(
+            "XDP Program attached to '{}'! Now waiting for Ctrl-C",
+            &opts.iface
+        );
+        signal::ctrl_c().await?;
+        info!("Exiting...");
+
+        Ok(())
+    } else {
+        let mut progs = vec![];
+        for (name, _program_type) in bpf.programs() {
+            progs.push(name);
+        }
+        Err(anyhow::Error::msg(format!(
+            "Unable to find the program '{}' in the loaded file '{}'. Available programs are: {}",
+            opts.program,
+            opts.file,
+            progs.join(", "),
+        )))
     }
-
-    info!(
-        "XDP Program attached to '{}'! Now waiting for Ctrl-C",
-        &opts.iface
-    );
-    signal::ctrl_c().await?;
-    info!("Exiting...");
-
-    Ok(())
 }
