@@ -27,7 +27,7 @@ pub fn {{to_snake_case tutorial_name}}_drop(ctx: XdpContext) -> u32 {
 
 fn try_{{to_snake_case tutorial_name}}_drop(ctx: XdpContext) -> Result<u32, u32> {
     warn!(&ctx, "Received a packet. Dropping!");
-    Ok(xdp_action::XDP_PASS)
+    Ok(xdp_action::XDP_DROP)
 }
 
 // Write a program that returns `XDP_ABORTED` Error.
