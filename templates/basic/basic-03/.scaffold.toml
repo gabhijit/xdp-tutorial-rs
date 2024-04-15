@@ -1,0 +1,30 @@
+[template]
+name = "basic"
+
+
+notes = """
+	Added the {{tutorial_name}} to your XDP Project {{name}}.
+
+	The Goal of this XDP tutorial is to introduce the concept of eBPF Maps and how they can be used
+	by XDP programs for different packet processing actions.
+
+	In this program, we are introducing a very simple Packet counter that -
+        1. Counts the number of Packets that match the given
+	```
+	# This should print the log "Received one packet."
+	$ RUST_LOG=info cargo xtask run --file {{tutorial_name}} --program {{to_snake_case tutorial_name}}_pass
+
+	# This should print the warning log "Received one packet. Dropping"
+	$ RUST_LOG=info cargo xtask run --file {{tutorial_name}} --program {{to_snake_case tutorial_name}}_drop
+
+	```
+
+	Next, as an assignment write a simple program that returns an error with `XDP_ABORTED`
+	error and an error is logged on the console.
+"""
+
+[parameters]
+	[parameters.tutorial_name]
+	type = "string"
+	message = "Name of the tutorial to use in XDP Project (default: 'basic-03')"
+	default = "basic-03"
