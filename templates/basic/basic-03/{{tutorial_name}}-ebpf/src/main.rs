@@ -10,7 +10,7 @@ use aya_ebpf::{
     maps::Array,
     programs::XdpContext,
 };
-use aya_log_ebpf::{info, error};
+use aya_log_ebpf::{debug, error};
 
 use {{ to_snake_case tutorial_name }}_common::StatsRecord;
 
@@ -29,7 +29,7 @@ pub fn {{to_snake_case tutorial_name}}_packet_stats(ctx: XdpContext) -> u32 {
 }
 
 fn try_{{to_snake_case tutorial_name}}_packet_stats(ctx: XdpContext) -> Result<u32, u32> {
-    info!(&ctx, "Received a packet.");
+    debug!(&ctx, "Received a packet.");
     let record = STATS_ARRAY.get_ptr_mut(xdp_action::XDP_PASS);
     if let Some(record) = record {
         let _ = unsafe {

@@ -8,11 +8,11 @@ anyhow = "1"
 clap = { version = "4.1", features = ["derive"] }
 aya = { git = "https://github.com/aya-rs/aya", features = ["async_tokio"] }
 aya-log = { git = "https://github.com/aya-rs/aya" }
-{{tutorial_name}}-common = { path = "../common"}
+{{tutorial_name}}-common = { path = "../common", features = ["user"]}
 env_logger = "0.10"
 libc = "0.2"
 log = "0.4"
-tokio = { version = "1.25", features = ["macros", "rt", "rt-multi-thread", "net", "signal"] }
+tokio = { version = "1.25", features = ["time", "macros", "rt", "rt-multi-thread", "net", "signal"] }
 
 [[bin]]
 name = "xdp-runner"

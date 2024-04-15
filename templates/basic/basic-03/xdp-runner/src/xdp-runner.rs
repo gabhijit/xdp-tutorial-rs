@@ -1,12 +1,17 @@
+use std::time::Duration;
+
 use anyhow::Context;
 
+use aya::maps::{Array, MapData};
 use aya::programs::{Xdp, XdpFlags};
 use aya::Ebpf;
 use aya_log::EbpfLogger;
 
 use clap::Parser;
 use log::{info, warn};
-use tokio::signal;
+use tokio::{signal, time};
+
+use basic_03_common::StatsRecord;
 
 #[derive(Debug, Parser)]
 struct Opt {
@@ -18,6 +23,11 @@ struct Opt {
 
     #[clap(short, long, default_value = "lo")]
     iface: String,
+}
+
+async fn print_stats(stats_array: &Array<&MapData, StatsRecord>) {
+    let stats = stats_array.get(&2, 0);
+    info!("Packet Count: {}", stats.unwrap().pkt_count);
 }
 
 // This is a Userspace program that is responsible for 'installing' the XDP eBPF binary in the
@@ -52,8 +62,22 @@ async fn main() -> Result<(), anyhow::Error> {
             "XDP Program attached to '{}'! Now waiting for Ctrl-C",
             &opts.iface
         );
-        signal::ctrl_c().await?;
-        info!("Exiting...");
+
+        let mut stats_poller_interval = time::interval(Duration::from_secs(2));
+
+        loop {
+            tokio::select! {
+                _ = stats_poller_interval.tick() => {
+                    info!("tick!");
+                    let stats_array = Array::try_from(bpf.map("STATS_ARRAY").unwrap()).unwrap();
+                    print_stats(&stats_array).await;
+                }
+                _ = signal::ctrl_c() => {
+                    info!("Exiting...");
+                    break;
+                }
+            }
+        }
 
         Ok(())
     } else {
@@ -61,6 +85,7 @@ async fn main() -> Result<(), anyhow::Error> {
         for (name, _program_type) in bpf.programs() {
             progs.push(name);
         }
+
         Err(anyhow::Error::msg(format!(
             "Unable to find the program '{}' in the loaded file '{}'. Available programs are: {}",
             opts.program,
