@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 aya-ebpf = { git = "https://github.com/aya-rs/aya" }
 aya-log-ebpf = { git = "https://github.com/aya-rs/aya" }
-{{ name }}-common = { path = "../common" }
+{{ tutorial_name }}-common = { path = "../common" }
 
 [[bin]]
 name = "{{ tutorial_name }}"
