@@ -10,6 +10,7 @@ edition = "2021"
 [dependencies]
 cargo-scaffold = { git = "https://github.com/gabhijit/cargo-scaffold" }
 clap = { version = "4.1", features = ["derive"] }
+anyhow = "1.0"
 
 [[bin]]
 name = "cargo-xdp-tutorial"
