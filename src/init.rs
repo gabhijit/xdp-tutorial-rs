@@ -21,28 +21,27 @@ pub(crate) struct InitCommand {
     tutorial_path: String,
 }
 
-pub(crate) fn do_init(init_command: InitCommand) -> anyhow::Result<()> {
-    eprintln!("Init Command: {init_command:#?}");
+pub(crate) fn do_init(cmd: InitCommand) -> anyhow::Result<()> {
+    eprintln!("Init Command: {cmd:#?}");
 
-    let scaffold_ops = cargo_scaffold::Opts::builder(init_command.template_path);
+    let scaffold_ops = cargo_scaffold::Opts::builder(cmd.template_path);
 
-    let scaffold_ops = if let Some(repository_template_path) = init_command.repository_template_path
-    {
+    let scaffold_ops = if let Some(repository_template_path) = cmd.repository_template_path {
         scaffold_ops.repository_template_path(repository_template_path)
     } else {
         scaffold_ops
     };
 
-    let scaffold_ops = if let Some(git_ref) = init_command.git_ref {
+    let scaffold_ops = if let Some(git_ref) = cmd.git_ref {
         scaffold_ops.repository_template_path(git_ref)
     } else {
         scaffold_ops
     };
 
-    let project_name = if init_command.tutorial_path.as_str() == "." {
+    let project_name = if cmd.tutorial_path.as_str() == "." {
         "xdp-tutorial-rust-sol".into()
     } else {
-        init_command.tutorial_path
+        cmd.tutorial_path
     };
 
     let scaffold_ops = scaffold_ops.project_name(project_name);

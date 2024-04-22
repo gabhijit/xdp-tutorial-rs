@@ -1,16 +1,15 @@
 // Binary that generates the
 
+mod add;
 mod init;
 
 use clap::Parser;
 
+use add::{do_add, AddCommand};
 use init::{do_init, InitCommand};
 
 #[derive(Debug, Parser)]
 struct TestSetup;
-
-#[derive(Debug, Parser)]
-struct AddTutorial;
 
 #[derive(Debug, Parser)]
 struct Cli {
@@ -27,7 +26,7 @@ enum Command {
     TestEnv(TestSetup),
 
     /// Add individual tutorials to the project.
-    Add(AddTutorial),
+    Add(AddCommand),
 }
 
 fn main() -> anyhow::Result<()> {
@@ -35,6 +34,7 @@ fn main() -> anyhow::Result<()> {
 
     match cli.command {
         Command::Init(i) => do_init(i),
+        Command::Add(a) => do_add(a),
         _ => todo!(),
     }
 }
