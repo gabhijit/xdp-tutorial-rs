@@ -1,7 +1,8 @@
 [package]
-name = "xdp-tutorial-runner"
+name = "{{tutorial_name}}-runner"
 version = "0.1.0"
 edition = "2021"
+description = "A Userspace program to run the {{tutorial_name}} tutorial from the command line."
 
 [dependencies]
 anyhow = "1"
@@ -15,6 +16,6 @@ log = "0.4"
 tokio = { version = "1.25", features = ["time", "macros", "rt", "rt-multi-thread", "net", "signal"] }
 
 [[bin]]
-name = "xdp-runner"
+name = "{{tutorial_name}}-runner"
 path = "src/xdp-runner.rs"
 

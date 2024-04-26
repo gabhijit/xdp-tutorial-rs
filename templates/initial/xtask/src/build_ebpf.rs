@@ -1,7 +1,7 @@
 // For building the eBPF (XDP) program.
 // Taken from `aya-template` and modified for our needs.
 //
-use std::{path::PathBuf, process::Command};
+use std::{path::Path, path::PathBuf, process::Command};
 
 use clap::Parser;
 
@@ -10,7 +10,7 @@ use crate::common::Architecture;
 #[derive(Debug, Parser)]
 pub struct Options {
     /// Name of the eBPF target to build
-    #[clap(short, long)]
+    #[clap(name = "name")]
     pub name: String,
 
     /// Set the endianness of the BPF target
@@ -23,8 +23,9 @@ pub struct Options {
 }
 
 pub fn build_ebpf(opts: Options) -> Result<(), anyhow::Error> {
+    let dir = PathBuf::from(&opts.name);
     let binary = format!("{}-ebpf", opts.name);
-    let dir = PathBuf::from(&binary);
+    let dir = Path::join(&dir, binary);
     let target = format!("--target={}", opts.target);
     let mut args = vec!["build", target.as_str(), "-Z", "build-std=core"];
     if opts.release {

@@ -32,6 +32,11 @@ notes = """
 	Next, as an assignment write a simple program that returns an error with `XDP_ABORTED`
 	error and an error is logged on the console.
 """
+[hooks]
+pre = [ "mkdir {{tutorial_name}}" ]
+
+post = [ "mv {{tutorial_name}}-ebpf common xdp-runner {{tutorial_name}}" ]
+
 
 [parameters]
 	[parameters.tutorial_name]

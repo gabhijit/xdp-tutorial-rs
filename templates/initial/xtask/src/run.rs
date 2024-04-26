@@ -11,9 +11,9 @@ use crate::common::Architecture;
 
 #[derive(Debug, Parser)]
 pub struct Options {
-    /// Set the name of the file to load.
-    #[clap(short, long)]
-    file: String,
+    /// Set the name of the Userspace binary to run
+    #[clap(name = "tutorial-name")]
+    tutorial_name: String,
 
     /// Set the name of the program to run.
     #[clap(short, long)]
@@ -58,7 +58,7 @@ fn build(opts: &Options) -> Result<(), anyhow::Error> {
 pub fn run(opts: Options) -> Result<(), anyhow::Error> {
     // build our ebpf program followed by our application
     build_ebpf(BuildOptions {
-        name: opts.file.clone(),
+        name: opts.tutorial_name.clone(),
         target: opts.bpf_target,
         release: opts.release,
     })
@@ -67,7 +67,7 @@ pub fn run(opts: Options) -> Result<(), anyhow::Error> {
 
     // profile we are building (release or debug)
     let profile = if opts.release { "release" } else { "debug" };
-    let bin_path = format!("target/{profile}/xdp-runner");
+    let bin_path = format!("target/{profile}/{0}-runner", &opts.tutorial_name);
 
     // arguments to pass to the application
     let mut run_args: Vec<_> = opts.run_args.iter().map(String::as_str).collect();
@@ -75,7 +75,7 @@ pub fn run(opts: Options) -> Result<(), anyhow::Error> {
         "--program",
         &opts.program,
         "--file",
-        &opts.file,
+        &opts.tutorial_name,
         "--iface",
         &opts.iface,
     ]
@@ -89,6 +89,7 @@ pub fn run(opts: Options) -> Result<(), anyhow::Error> {
 
     // run the command
     let status = Command::new(args.first().expect("No first argument"))
+        .env("RUST_LOG", "info")
         .args(args.iter().skip(1))
         .status()
         .expect("failed to run the command");

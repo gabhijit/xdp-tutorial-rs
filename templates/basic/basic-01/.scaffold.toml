@@ -24,6 +24,11 @@ notes = """
 	to the interface (default 'lo' or can be specified by `-i <iface>` additional option).
 """
 
+[hooks]
+pre = [ "mkdir {{tutorial_name}}" ]
+
+post = [ "mv {{tutorial_name}}-ebpf common xdp-runner {{tutorial_name}}" ]
+
 [parameters]
 	[parameters.tutorial_name]
 	type = "string"

@@ -1,3 +1,2 @@
 [alias]
 xtask="run --package xdp-tutorial-xtask --"
-xdp-runner="run --package {{tutorial_name}}-runner --bin xdp-runner --"

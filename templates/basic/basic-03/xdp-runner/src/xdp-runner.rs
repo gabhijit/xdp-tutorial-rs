@@ -59,8 +59,8 @@ async fn main() -> Result<(), anyhow::Error> {
         }
 
         info!(
-            "XDP Program attached to '{}'! Now waiting for Ctrl-C",
-            &opts.iface
+            "XDP Program '{}' attached to '{}'! Now waiting for Ctrl-C",
+            &opts.program, &opts.iface
         );
 
         let mut stats_poller_interval = time::interval(Duration::from_secs(2));
