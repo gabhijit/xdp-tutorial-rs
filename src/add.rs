@@ -9,6 +9,7 @@ use cargo_scaffold::Value;
 use clap::Parser;
 
 #[derive(Debug, Parser)]
+#[command(author = "Abhijit Gadgil", version)]
 pub(crate) struct AddCommand {
     /// Path to directory or a repository containing tutorial template.
     #[clap(name = "template-path")]

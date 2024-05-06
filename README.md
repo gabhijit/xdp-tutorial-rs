@@ -43,17 +43,29 @@ cargo install llvm
 
 # Starting the tutorial
 
-Just to make sure that we have everything set up properly, we will start with a basic 'hello-xdp' program and then actually start with the parts of the tutorial.
+Once the required dependencies are setup properly, we can start running the tutorial. This is done in two parts. First part would install `cargo-xdp-tutorial` command from the repository of the root and then in the second part, we will use the command `cargo-xdp-tutorial` to actually get started with the tutorial. This is described below.
 
-We are making use of a utility called as `cargo-scaffold` to generate basic scaffolding code for different parts of the tutorial.
-
-Run the following commands to get started.
+## Installing `cargo-xdp-tutorial`
 
 ```bash
-# Use the Project Name as `tutorial` when prompted.
+# This will install the latest `cargo-xdp-tutorial` binary from the current directory (crate).
+$ cargo install --path . --force
 
-$ cargo scaffold templates/initial
+# Verify that `xdp-tutorial` sub command is installed.
+$ cargo xdp-tutorial help
 ```
 
-Follow the instructions displayed after that.
+## Running your first tutorial.
 
+We create a very simple tutorial that prints a simple log statement when a packet is received on an interface.
+```bash
+
+# Following command will copy 'templates' from the templates/initial directory and creating a basic
+# scaffolding to which individual tutorials can be added subsequently.
+$ cargo xdp-tutorial init templates/initial tutorial
+
+# Add the 'basic-01' to the tutorial created above.
+# Follow the instructions when prompted.
+$ cargo xdp-tutorial add templates/basic/basic-01 tutorial
+
+```

@@ -3,6 +3,7 @@
 use clap::Parser;
 
 #[derive(Debug, Parser)]
+#[command(author = "Abhijit Gadgil", version)]
 pub(crate) struct InitCommand {
     /// A Path to local directory or a git repository containing XDP Tutorial Templates.
     #[clap(name = "template-path")]
