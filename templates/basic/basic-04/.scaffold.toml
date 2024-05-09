@@ -1,0 +1,24 @@
+[template]
+name = "basic"
+
+
+notes = """
+	Added the {{tutorial_name}} to your XDP Project {{name}}.
+
+	The Goal of this tutorial is to introduce the concept of Pinning the eBPF Maps. eBPF Maps when pinned
+	are persistent even when the eBPF program that loaded the map is unloaded from the kernel.
+
+	We continue with our packet counter from the previous tutorial and use a Per CPU version of the eBPF
+	map for counting packets corresponding to different actions.
+"""
+[hooks]
+pre = [ "mkdir {{tutorial_name}}" ]
+
+post = [ "mv {{tutorial_name}}-ebpf common xdp-runner {{tutorial_name}}" ]
+
+
+[parameters]
+	[parameters.tutorial_name]
+	type = "string"
+	message = "Name of the tutorial to use in XDP Project (default: 'basic-04')"
+	default = "basic-04"
