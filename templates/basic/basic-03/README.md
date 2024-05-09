@@ -36,7 +36,7 @@ Thus this exercise should serve as a good starting point for real `XDP` program.
 
 The kernel space APIs are provided by [aya-ebpf](https://docs.aya-rs.dev/aya_ebpf/) crate. We'll look at a simple API for working with an Array.
 
-An `Array` is a generic structure that can be created using one of the two APIs `with_max_entries` or `pinned`. For Recording the actual statistics we will be using a structure called `StatsRecord`. The structure contains entries for packet count and byte counts (this will be exercise). The eBPF Array then will be instantiated as follows. Since this is a Global array, we will be instantiating a 'static' array.
+An `Array` is a generic structure that can be created using one of the two APIs `with_max_entries` or `pinned`. For Recording the actual statistics we will be using a structure called `StatsRecord`. The structure contains entries for packet count and byte counts (this will be exercise). The eBPF Array then will be instantiated as follows. Since this is a Global array, we will be instantiating a 'static' array. Also, note that both `with_max_entries` and `pinned` are `const fn`s and hence can be called from [const-contexts](https://doc.rust-lang.org/reference/const_eval.html#const-context) and that's why it's possible to initialize the `static STATS_ARRAY` below.
 
 
 ```rust

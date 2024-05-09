@@ -9,18 +9,12 @@ notes = """
 	by XDP programs for different packet processing actions.
 
 	In this program, we are introducing a very simple Packet counter that -
-        1. Counts the number of Packets that match the given
-	```
-	# This should print the log "Received one packet."
-	$ RUST_LOG=info cargo xtask run --file {{tutorial_name}} --program {{to_snake_case tutorial_name}}_pass
+        1. Counts the number of Packets that match XDP_PASS action.
 
-	# This should print the warning log "Received one packet. Dropping"
-	$ RUST_LOG=info cargo xtask run --file {{tutorial_name}} --program {{to_snake_case tutorial_name}}_drop
+	This tutorial also explores the concepts of how to use atomics inside the eBPF kernel code.
 
-	```
-
-	Next, as an assignment write a simple program that returns an error with `XDP_ABORTED`
-	error and an error is logged on the console.
+	Next, as an assignment we will take a look at different kind of Map called Per CPU Array and
+	how that Map can be used.
 """
 [hooks]
 pre = [ "mkdir {{tutorial_name}}" ]

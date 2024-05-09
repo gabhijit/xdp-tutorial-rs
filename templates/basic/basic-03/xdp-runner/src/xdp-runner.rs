@@ -11,7 +11,7 @@ use clap::Parser;
 use log::{info, warn};
 use tokio::{signal, time};
 
-use basic_03_common::StatsRecord;
+use {{ to_snake_case tutorial_name }}_common::StatsRecord;
 
 #[derive(Debug, Parser)]
 struct Opt {
