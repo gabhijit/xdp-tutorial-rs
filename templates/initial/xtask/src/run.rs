@@ -40,8 +40,27 @@ pub struct Options {
     pub run_args: Vec<String>,
 }
 
+#[derive(Debug, Parser)]
+pub struct RunOptions {
+    /// Name of the tutorial to call the runner
+    #[clap(name = "tutorial-name")]
+    tutorial_name: String,
+
+    /// Set the endianness of the BPF target
+    #[clap(default_value = "bpfel-unknown-none", long)]
+    pub target: Architecture,
+
+    /// Build the release target
+    #[clap(long)]
+    pub release: bool,
+
+    /// Arguments to be passed to the runner
+    #[clap(name = "run-args", last = true)]
+    run_args: Vec<String>,
+}
+
 /// Build the project
-fn build(opts: &Options) -> Result<(), anyhow::Error> {
+fn build(opts: &RunOptions) -> Result<(), anyhow::Error> {
     let mut args = vec!["build"];
     if opts.release {
         args.push("--release")
@@ -55,11 +74,12 @@ fn build(opts: &Options) -> Result<(), anyhow::Error> {
 }
 
 /// Build and run the project
-pub fn run(opts: Options) -> Result<(), anyhow::Error> {
+pub fn run(opts: RunOptions) -> Result<(), anyhow::Error> {
+    eprintln!("xtask run args: {:#?}", opts);
     // build our ebpf program followed by our application
     build_ebpf(BuildOptions {
         name: opts.tutorial_name.clone(),
-        target: opts.bpf_target,
+        target: opts.target,
         release: opts.release,
     })
     .context("Error while building eBPF program")?;
@@ -70,23 +90,18 @@ pub fn run(opts: Options) -> Result<(), anyhow::Error> {
     let bin_path = format!("target/{profile}/{0}-runner", &opts.tutorial_name);
 
     // arguments to pass to the application
-    let mut run_args: Vec<_> = opts.run_args.iter().map(String::as_str).collect();
-    let mut bpf_program = [
-        "--program",
-        &opts.program,
-        "--file",
-        &opts.tutorial_name,
-        "--iface",
-        &opts.iface,
-    ]
-    .to_vec();
+    let mut run_args = opts.run_args.clone();
+    let mut bpf_program = ["--file", &opts.tutorial_name]
+        .map(|x| x.to_string())
+        .to_vec();
     run_args.append(&mut bpf_program);
 
     // configure args
-    let mut args: Vec<_> = opts.runner.trim().split_terminator(' ').collect();
-    args.push(bin_path.as_str());
+    let mut args: Vec<_> = vec!["sudo".to_string(), "-E".to_string()];
+    args.push(bin_path);
     args.append(&mut run_args);
 
+    eprintln!("args: {}", args.join(" "));
     // run the command
     let status = Command::new(args.first().expect("No first argument"))
         .env("RUST_LOG", "info")

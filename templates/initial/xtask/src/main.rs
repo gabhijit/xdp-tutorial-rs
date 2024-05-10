@@ -16,7 +16,7 @@ pub struct Options {
 #[derive(Debug, Parser)]
 enum Command {
     BuildEbpf(build_ebpf::Options),
-    Run(run::Options),
+    Run(run::RunOptions),
 }
 
 fn main() {
