@@ -99,6 +99,9 @@ pub fn run(opts: RunOptions) -> Result<(), anyhow::Error> {
     // configure args
     let mut args: Vec<_> = vec!["sudo".to_string(), "-E".to_string()];
     args.push(bin_path);
+    if opts.release {
+        args.push("--release".to_string());
+    }
     args.append(&mut run_args);
 
     eprintln!("args: {}", args.join(" "));

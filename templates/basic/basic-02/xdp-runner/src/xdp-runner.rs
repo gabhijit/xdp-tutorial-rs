@@ -18,6 +18,9 @@ struct Opt {
 
     #[clap(short, long, default_value = "lo")]
     iface: String,
+
+    #[clap(long)]
+    release: bool,
 }
 
 // This is a Userspace program that is responsible for 'installing' the XDP eBPF binary in the
@@ -34,7 +37,8 @@ async fn main() -> Result<(), anyhow::Error> {
     let opts = Opt::parse();
     env_logger::init();
 
-    let bpf_bin = format!("target/bpfel-unknown-none/debug/{}", opts.file);
+    let profile = if opts.release { "release" } else { "debug" };
+    let bpf_bin = format!("target/bpfel-unknown-none/{}/{}", profile, opts.file);
     let bpf_bin = std::fs::read(&bpf_bin)?;
     let mut bpf = Ebpf::load(&bpf_bin)?;
     let xdp_program = bpf.program_mut(&opts.program);
