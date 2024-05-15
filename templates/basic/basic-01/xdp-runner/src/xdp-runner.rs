@@ -13,7 +13,7 @@ struct Opt {
     #[clap(short, long)]
     program: String,
 
-    #[clap(short, long)]
+    #[clap(short, long, default_value = "{{tutorial_name}}")]
     file: String,
 
     #[clap(short, long, default_value = "lo")]

@@ -75,7 +75,6 @@ fn build(opts: &RunOptions) -> Result<(), anyhow::Error> {
 
 /// Build and run the project
 pub fn run(opts: RunOptions) -> Result<(), anyhow::Error> {
-    eprintln!("xtask run args: {:#?}", opts);
     // build our ebpf program followed by our application
     build_ebpf(BuildOptions {
         name: opts.tutorial_name.clone(),
@@ -91,17 +90,13 @@ pub fn run(opts: RunOptions) -> Result<(), anyhow::Error> {
 
     // arguments to pass to the application
     let mut run_args = opts.run_args.clone();
-    let mut bpf_program = ["--file", &opts.tutorial_name]
-        .map(|x| x.to_string())
-        .to_vec();
-    run_args.append(&mut bpf_program);
+    if opts.release {
+        run_args.push("--release".to_string());
+    }
 
     // configure args
     let mut args: Vec<_> = vec!["sudo".to_string(), "-E".to_string()];
     args.push(bin_path);
-    if opts.release {
-        args.push("--release".to_string());
-    }
     args.append(&mut run_args);
 
     eprintln!("args: {}", args.join(" "));
