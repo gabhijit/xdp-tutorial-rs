@@ -82,17 +82,18 @@ pub fn run(opts: RunOptions) -> Result<(), anyhow::Error> {
         release: opts.release,
     })
     .context("Error while building eBPF program")?;
+
+    // Build our 'xdp-loader' application
     build(&opts).context("Error while building userspace application")?;
 
     // profile we are building (release or debug)
     let profile = if opts.release { "release" } else { "debug" };
+
+    // Obtain Path to the binary we will be running
     let bin_path = format!("target/{profile}/{0}-runner", &opts.tutorial_name);
 
     // arguments to pass to the application
     let mut run_args = opts.run_args.clone();
-    if opts.release {
-        run_args.push("--release".to_string());
-    }
 
     // configure args
     let mut args: Vec<_> = vec!["sudo".to_string(), "-E".to_string()];
