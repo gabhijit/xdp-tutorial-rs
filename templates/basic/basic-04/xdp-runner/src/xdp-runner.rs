@@ -4,7 +4,7 @@ use anyhow::Context;
 
 use aya::maps::{Map, MapData, PerCpuArray};
 use aya::programs::{links::FdLink, Xdp, XdpFlags};
-use aya::{Ebpf, EbpfLoader};
+use aya::EbpfLoader;
 
 use clap::{Parser, ValueEnum};
 use tokio::{signal, time};
@@ -112,11 +112,12 @@ fn pin_program_and_maps(opts: PinOptions) -> Result<(), anyhow::Error> {
 
         log::info!(
             "XDP Program: '{}' attached to interface: '{}' and pinned at path: '{}'",
-            program_name, &opts.iface, program_pin_path,
+            program_name,
+            &opts.iface,
+            program_pin_path,
         );
 
         Ok(())
-
     } else {
         let mut progs = vec![];
         for (name, _program_type) in bpf.programs() {
@@ -149,13 +150,20 @@ struct StatsOptions {
 }
 
 async fn stats(opts: StatsOptions) -> anyhow::Result<()> {
-
     let mut stats_poller_interval = time::interval(Duration::from_secs(2));
 
     let map_pin_path = format!(
         "/sys/fs/bpf/{}/{}/maps/PINNED_PERCPU_ARRAY",
         opts.iface, opts.name
     );
+
+    if !std::path::Path::new(&map_pin_path).exists() {
+        return Err(anyhow::Error::msg(
+                "Map PINNED_PERCPU_ARRAY is not pinned. Please run 'pin --action <action>' to pin the map."
+                ));
+    }
+
+
     let map_data = MapData::from_pin(map_pin_path).unwrap();
     let map = Map::PerCpuArray(map_data);
     let stats_array = map.try_into().unwrap();
@@ -189,7 +197,9 @@ async fn print_stats_for_action(
     for (i, value) in values.iter().enumerate() {
         log::info!(
             "CPU: {}, Action: {}, Packet Count: {}",
-            i, action_name, value.pkt_count
+            i,
+            action_name,
+            value.pkt_count
         );
         total_packets += value.pkt_count;
     }
@@ -217,19 +227,24 @@ struct UnpinOptions {
 }
 
 fn unpin_program_and_maps(opts: UnpinOptions) -> Result<(), anyhow::Error> {
-    if !opts.programs_only  || opts.maps_only {
+    let pin_base_path = format!("/sys/fs/bpf/{}/{}", opts.iface, opts.name);
+
+    if !opts.programs_only || opts.maps_only {
         // Remove the pinned maps if any
-        let map_pin_path = format!( "/sys/fs/bpf/{}/{}/maps", opts.iface, opts.name);
+        let map_pin_path = format!("{}/maps", pin_base_path);
         std::fs::remove_dir_all(map_pin_path)?;
         log::info!("Removed ALL pinned maps for '{}'!", opts.name);
     }
 
     if !opts.maps_only || opts.programs_only {
-
         // Remove the pinned programs if any
-        let program_pin_path = format!("/sys/fs/bpf/{}/{}/programs", opts.iface, opts.name);
+        let program_pin_path = format!("{}/programs", pin_base_path);
         std::fs::remove_dir_all(program_pin_path)?;
         log::info!("Removed ALL pinned programs for '{}'!", opts.name);
+    }
+
+    if std::fs::read_dir(&pin_base_path)?.next().is_none() {
+        std::fs::remove_dir_all(&pin_base_path)?;
     }
 
     Ok(())
@@ -252,28 +267,52 @@ struct ListOptions {
     /// File to 'load' to list programs and maps
     #[clap(long, default_value = "{{tutorial_name}}")]
     file: String,
+
+    /// Interface for which Maps and programs are loaded
+    #[clap(short, long, default_value = "lo")]
+    iface: String,
 }
 
 fn list_programs_and_maps(opts: ListOptions) -> Result<(), anyhow::Error> {
-    let profile = if opts.release { "release" } else { "debug" };
+    let pin_base_path = format!("/sys/fs/bpf/{}/{}", opts.iface, opts.file);
 
-    let bpf_file = format!("target/bpfel-unknown-none/{}/{}", profile, opts.file);
-
-    let bpf = Ebpf::load_file(bpf_file)?;
+    if !std::path::Path::new(&pin_base_path).exists() {
+        println!("No Maps or Programs currently loaded.");
+        return Ok(());
+    }
 
     if !opts.maps_only || opts.programs_only {
         println!("programs: ");
-        for (name, _) in bpf.programs() {
-            println!("\t{name}");
+        let programs_path = format!("{}/programs", pin_base_path);
+        if !std::path::Path::new(&programs_path).exists() {
+            println!("\tNo Programs currently pinned.");
+        } else {
+            for entry in std::fs::read_dir(programs_path)? {
+                println!(
+                    "\t{}",
+                    entry?
+                        .file_name()
+                        .into_string()
+                        .map_err(|_| anyhow::Error::msg("Cannot convert filename to String"))?
+                );
+            }
         }
     }
 
     if !opts.programs_only || opts.maps_only {
         println!("maps: ");
-        let ignored_maps = [ ".rodata", "AYA_LOGS", "AYA_LOG_BUF"];
-        for (name, _) in bpf.maps() {
-            if !ignored_maps.contains(&name) {
-                println!("\t{name}");
+        let maps_path = format!("{}/maps", pin_base_path);
+        if !std::path::Path::new(&maps_path).exists() {
+            println!("\tNo Maps currently pinned.");
+        } else {
+            for entry in std::fs::read_dir(maps_path)? {
+                println!(
+                    "\t{}",
+                    entry?
+                        .file_name()
+                        .into_string()
+                        .map_err(|_| anyhow::Error::msg("Cannot convert filename to String"))?
+                );
             }
         }
     }
