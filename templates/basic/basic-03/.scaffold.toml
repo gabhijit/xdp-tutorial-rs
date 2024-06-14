@@ -19,7 +19,7 @@ notes = """
 [hooks]
 pre = [ "mkdir {{tutorial_name}}" ]
 
-post = [ "mv {{tutorial_name}}-ebpf common xdp-runner {{tutorial_name}}" ]
+post = [ "mv README.md {{tutorial_name}}-ebpf common xdp-runner {{tutorial_name}}" ]
 
 
 [parameters]
