@@ -54,6 +54,10 @@ pub struct RunOptions {
     #[clap(long)]
     pub release: bool,
 
+    /// Log Verbosity Level (default: info, '-v': debug, '-vv...': trace)
+    #[clap(short, action = clap::ArgAction::Count)]
+    pub verbosity: u8,
+
     /// Arguments to be passed to the runner
     #[clap(name = "run-args", last = true)]
     run_args: Vec<String>,
@@ -100,10 +104,16 @@ pub fn run(opts: RunOptions) -> Result<(), anyhow::Error> {
     args.push(bin_path);
     args.append(&mut run_args);
 
-    eprintln!("args: {}", args.join(" "));
+    let loglevel = match opts.verbosity {
+        0 => "info",
+        1 => "debug",
+        2.. => "trace",
+    };
+
+    eprintln!("args: {}, loglevel: {}", args.join(" "), loglevel);
     // run the command
     let status = Command::new(args.first().expect("No first argument"))
-        .env("RUST_LOG", "info")
+        .env("RUST_LOG", loglevel)
         .args(args.iter().skip(1))
         .status()
         .expect("failed to run the command");

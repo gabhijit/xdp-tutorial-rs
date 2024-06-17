@@ -28,7 +28,7 @@ struct Opt {
 //
 // This program will be run when you are running `cargo xtask run`. The actual packet processing
 // logic is implemented in the `<tutorial_name>-ebpf` package, whose generated output is passed
-// as an argument to this program as `--file`. In a given file there may be more than one 'prgrams'
+// as an argument to this program as `--file`. In a given file there may be more than one 'programs'
 // in the `xdp` section, which program is to be attached is specified by the `--program` argument.
 // Optionally, we can also give the interface to which the program is to be attached by specifying
 // the `--iface` flag (default being `lo`).
