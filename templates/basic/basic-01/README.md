@@ -41,5 +41,3 @@ No additional exercises.
 ## Kernel Logging with `aya-log-ebpf`
 
 One might have noticed, how can we trivially use the same logging API as in user space in the kernel spaces? The way it is actually achieved by `aya-log-ebpf` crate is using what is called as `perf` events. When we will learn more about 'eBPF maps' we will revisit this and discuss more about how the kernel level logging happens when we run the user space program.
-
-

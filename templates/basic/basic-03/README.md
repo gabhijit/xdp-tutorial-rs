@@ -6,7 +6,7 @@ Although they are called as Maps, they are essentially different data structures
 
 The main learning objective of this tutorial is to understand how to work with the eBPF Maps using the kernel space and user space APIs provided by [aya-rs](https://aya-rs.dev/aya/). The tutorial would also explore the concept of atomic operations and how they are to be used (while updating the maps) and provide a motivation for using `PerCpuyArray` and use these APIs.
 
-## Problem Statement
+# Problem Statement
 
 Initially, we will be using [Arrays](https://docs.aya-rs.dev/aya_ebpf/maps/array/struct.array) a kind of eBPF maps, to store data specific to store statistics specific to a particular packet received on an interface. For a packet received on an interface, these are the following actions -
 1. `XDP_ABORTED` - Signaling error in packet processing
@@ -18,15 +18,6 @@ Initially, we will be using [Arrays](https://docs.aya-rs.dev/aya_ebpf/maps/array
 In this tutorial, we are maintaining a simple statistics about the total packets and the total bytes that are handled by individual action in the `XDP` maps of type `Array`. As seen in the previous tutorials, whenever an XDP program is attached to a specific interface, that program is invoked for every received packet on the interface and a specific action will be taken for each packet. Currently, we are just recording the packets received and take the `XDP_PASS` action. For each received packet, the `Array`(`Map`) created is updated.
 
 The corresponding user space program will read this `Map` and log the received packet count on the console.
-
-## Exercises
-
-In addition to the existing programs, additional exercises are provided to work with -
-
-1. Per CPU Arrays
-2. Using the data from the `Context` to count the number of bytes.
-
-Thus this exercise should serve as a good starting point for real `XDP` program.
 
 # APIs
 
@@ -59,11 +50,9 @@ Idx Name          Size     VMA              Type
 
 For updating the `STATS_ARRAY` above we will be making use of the `get_ptr_mut` API of the `Array`. Note: This API returns an Optional 'raw pointer', and we will be de-referencing this pointer to update the statistics. This action should be done in an `unsafe` block.
 
-
 ### A Note about atomic operations
 
 A received packet can be processed on any of the CPUs and since this `Array` is shared across all the CPUs, we need to make sure that whenever the `Array` is updated, it should be done using 'atomic' instructions. In the kernel currently the `AtomicU*.fetch_add` instructions don't work, instead one should use the `intrinsics` versions as described [here](https://rust.docs.kernel.org/core/intrinsics/index.html).
-
 
 ## User space API
 
@@ -74,7 +63,25 @@ stats_array = Array::try_from(bpf.map("STATS_ARRAY").unwrap()).unwrap();
 ```
 And then `get` API on the returned Array can be used to read the value specific to particular key (the XDP action is the key in this case).
 
+For loading the BPF programs from the user space, we are making use of [`Ebpf.load`]() API provided by aya user space crate.
 
 ## Common Code
 
 The `StatsRecord` structure is used by both the kernel space API and the user space API. This structure is provided by a `common` package used by both kernel space and user space API. One more additional detail is - the trait called [`Pod`](https://docs.aya-rs.dev/aya/trait.pod) is required to be derived for our structure [`StatsRecord`] for reading the data from the kernel space.
+
+# Exercises
+
+In addition to the existing programs, additional exercises are provided to work with -
+
+1. Per CPU Arrays
+2. Using the data from the `Context` to count the number of bytes.
+
+Thus this exercise should serve as a good starting point for real `XDP` program.
+
+# Notes
+
+## Revisiting Kernel Logs (`aya-logs-ebpf`)
+
+In the first tutorial [`basic-01`](../basic-01/README.md), We observed that one can use logging similar to the user space in kernel space. The way this works is as follows -
+1. The kernel module creates `PerfEventByteArray` and log entries are sent as perf events using this array to the user space.
+2. The user space module (`aya-log`) reads these entries asynchronously and uses a user space logger to log the entries.

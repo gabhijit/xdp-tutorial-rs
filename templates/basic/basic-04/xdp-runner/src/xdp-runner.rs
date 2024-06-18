@@ -94,17 +94,23 @@ fn pin_program_and_maps(opts: PinOptions) -> Result<(), anyhow::Error> {
         // The `Xdp` program variant of the Enum
         let xdp: &mut Xdp = xdp_program.try_into()?;
 
-        log::trace!("Loading XDP Program '{program_name}' in the Kernel");
         // Load the program in the kernel.
+        log::trace!("Loading XDP Program '{program_name}' in the Kernel");
         xdp.load()?;
 
         let link_id = xdp
         .attach(&opts.iface, XdpFlags::default())
         .context("Failed to attach the program to the interface using the `XdpFlags::default()`, try using `XdpFlags::SKB_MODE`")?;
 
+        // Take the ownership of the attached link.
         let xdp_link = xdp.take_link(link_id)?;
         let fd_link: FdLink = xdp_link.try_into().unwrap();
 
+        // Pin the owned link
+        // If we don't pin the owned link, after the program exits, the 'program' is no longer
+        // 'attached' to the interface even though it may be loaded in the kernel if we simply
+        // use the `Xdp.pin` API. This is not what we want, we want the attached program to
+        // continue processing the packets even when the program that attached it exits.
         let program_pin_path = format!("/sys/fs/bpf/{}/{}/programs", opts.iface, opts.file);
         std::fs::create_dir_all(&program_pin_path)?;
         let program_pin_path = format!("{}/{}", program_pin_path, program_name);
