@@ -1,16 +1,15 @@
 [package]
 name = "xdp-tutorial-rs"
-description = "XDP tutorial in Rust using Aya bindings."
+description = "XDP tutorial in Rust using Aya Rust bindings."
 authors = ["Abhijit Gadgil <gabhijit@iitbombay.org>"]
-version = "0.0.1"
+version = "0.1.0"
 edition = "2021"
 include = ["src/**/*.rs", "README.md", "LICENSE"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cargo-scaffold = { git = "https://github.com/gabhijit/cargo-scaffold" , tag= "param-hooks"}
-#cargo-scaffold = { path = "../cargo-scaffold" }
+cargo-scaffold = { version = "0.14.0" }
 clap = { version = "4.1", features = ["derive"] }
 anyhow = "1.0"
 

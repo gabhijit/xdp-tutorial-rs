@@ -11,11 +11,10 @@ using templates from the `templates/basic/` directory.
 
 ```
 # For example to run 'basic-01' tutorial, run the following command
-cargo scaffold templates/basic/basic-01 --append
+cargo xdp-tutorial add templates/basic/basic-01 {{name}}
 ```
 
 When prompted for tutorial name - you can use name like `basic-01`.
-When prompted for project name - use '{{name}}' (Same as above).
 
 This will setup basic code for tutorial. You can then edit the code to
 complete the tutorial.
