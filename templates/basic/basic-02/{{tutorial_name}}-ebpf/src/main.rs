@@ -46,6 +46,7 @@ fn try_{{to_snake_case tutorial_name}}_drop(ctx: XdpContext) -> Result<u32, u32>
 // pub fn {{to_snake_case tutorial_name}}_abort(ctx: XdpContext) -> u32 {
 // // Add code here
 // }
+// ```
 
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo) -> ! {

@@ -19,11 +19,7 @@ enum CliCommand {
     /// Stats: Loads a given Map and
     Stats(StatsOptions),
 
-    /// Unpin: Unpins, Removes a pinned map
-    Unpin(UnpinOptions),
-
-    /// List: Lists all Pinned Maps
-    List(ListOptions),
+    // TODO: Add List and Unpin Commands
 }
 
 // Handling of the 'pin' command.
@@ -212,120 +208,6 @@ async fn print_stats_for_action(
     log::info!("Action: {}, Total  Packets: {}", action_name, total_packets);
 }
 
-// Handling of the 'unpin' command.
-#[derive(Debug, Parser)]
-struct UnpinOptions {
-    /// Name for searching the maps and programs in the 'pin' Path
-    #[clap(short, long, default_value = "{{tutorial_name}}")]
-    name: String,
-
-    /// Interface to which the programs and maps are 'pinned'.
-    #[clap(short, long, default_value = "lo")]
-    iface: String,
-
-    /// Unpin only maps
-    #[clap(long)]
-    maps_only: bool,
-
-    /// Unpin only programs
-    #[clap(long)]
-    programs_only: bool,
-}
-
-fn unpin_program_and_maps(opts: UnpinOptions) -> Result<(), anyhow::Error> {
-    let pin_base_path = format!("/sys/fs/bpf/{}/{}", opts.iface, opts.name);
-
-    if !opts.programs_only || opts.maps_only {
-        // Remove the pinned maps if any
-        let map_pin_path = format!("{}/maps", pin_base_path);
-        std::fs::remove_dir_all(map_pin_path)?;
-        log::info!("Removed ALL pinned maps for '{}'!", opts.name);
-    }
-
-    if !opts.maps_only || opts.programs_only {
-        // Remove the pinned programs if any
-        let program_pin_path = format!("{}/programs", pin_base_path);
-        std::fs::remove_dir_all(program_pin_path)?;
-        log::info!("Removed ALL pinned programs for '{}'!", opts.name);
-    }
-
-    if std::fs::read_dir(&pin_base_path)?.next().is_none() {
-        std::fs::remove_dir_all(&pin_base_path)?;
-    }
-
-    Ok(())
-}
-
-#[derive(Debug, Parser)]
-struct ListOptions {
-    /// List only maps
-    #[clap(long)]
-    maps_only: bool,
-
-    /// List only programs
-    #[clap(long)]
-    programs_only: bool,
-
-    /// Use the 'release' mode of the binary
-    #[clap(long)]
-    release: bool,
-
-    /// File to 'load' to list programs and maps
-    #[clap(long, default_value = "{{tutorial_name}}")]
-    file: String,
-
-    /// Interface for which Maps and programs are loaded
-    #[clap(short, long, default_value = "lo")]
-    iface: String,
-}
-
-fn list_programs_and_maps(opts: ListOptions) -> Result<(), anyhow::Error> {
-    let pin_base_path = format!("/sys/fs/bpf/{}/{}", opts.iface, opts.file);
-
-    if !std::path::Path::new(&pin_base_path).exists() {
-        println!("No Maps or Programs currently loaded.");
-        return Ok(());
-    }
-
-    if !opts.maps_only || opts.programs_only {
-        println!("programs: ");
-        let programs_path = format!("{}/programs", pin_base_path);
-        if !std::path::Path::new(&programs_path).exists() {
-            println!("\tNo Programs currently pinned.");
-        } else {
-            for entry in std::fs::read_dir(programs_path)? {
-                println!(
-                    "\t{}",
-                    entry?
-                        .file_name()
-                        .into_string()
-                        .map_err(|_| anyhow::Error::msg("Cannot convert filename to String"))?
-                );
-            }
-        }
-    }
-
-    if !opts.programs_only || opts.maps_only {
-        println!("maps: ");
-        let maps_path = format!("{}/maps", pin_base_path);
-        if !std::path::Path::new(&maps_path).exists() {
-            println!("\tNo Maps currently pinned.");
-        } else {
-            for entry in std::fs::read_dir(maps_path)? {
-                println!(
-                    "\t{}",
-                    entry?
-                        .file_name()
-                        .into_string()
-                        .map_err(|_| anyhow::Error::msg("Cannot convert filename to String"))?
-                );
-            }
-        }
-    }
-
-    Ok(())
-}
-
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
     env_logger::init();
@@ -335,7 +217,6 @@ async fn main() -> Result<(), anyhow::Error> {
     match cli {
         CliCommand::Pin(opts) => pin_program_and_maps(opts),
         CliCommand::Stats(opts) => stats(opts).await,
-        CliCommand::Unpin(opts) => unpin_program_and_maps(opts),
-        CliCommand::List(opts) => list_programs_and_maps(opts),
+        // TODO : Add List and Unpin commands
     }
 }
